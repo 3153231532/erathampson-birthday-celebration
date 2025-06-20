@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🎂 Happy Birthday Chrispus</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- FontAwesome -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+</head>
+<body style="margin:0; padding:0; background: url('cute-christmas-background-with-bokeh_1361-3548.jpg') no-repeat center center fixed; background-size: cover; font-family: Arial, sans-serif; color: white; overflow: hidden;">
+  
+  <!-- Star Glitter Animation -->
+  <div id="stars" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index:0;"></div>
+
+  <!-- Main Welcome Section -->
+  <div style="z-index:1; position:relative; width:100%; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+    
+    <img src="chris (2).jpg" alt="Adoko Chrispus" style="width:140px; height:140px; border-radius:50%; border:3px solid gold; margin-bottom:10px;">
+
+    <h1 style="font-size:26px; padding:10px; background: rgba(0,0,0,0.4); border-radius:15px; backdrop-filter:blur(6px); box-shadow:0 0 10px rgba(255,215,0,0.8); max-width:90%;">
+      🎉 Welcome to <strong style="color:gold;">Chrispus' Birthday Contribution</strong> 🎉
+    </h1>
+
+    <p style="font-size:16px; max-width:85%; padding:10px; background: rgba(0,0,0,0.5); border-radius:12px; margin-top:10px;">
+      Join me in celebrating this joyful moment on <strong>28th June 2025</strong> at Yellow House Apac! 💛<br>
+      Let's make it memorable together.
+    </p>
+
+    <!-- Timer -->
+    <div id="timer" style="margin-top:20px; font-size:22px; font-weight:bold; color:lightyellow; background: rgba(0, 0, 0, 0.5); padding:8px 14px; border-radius:10px;"></div>
+
+    <!-- Join Button -->
+    <button onclick="window.location.href='form.html'" style="margin-top:25px; padding:12px 25px; font-size:16px; color:white; background-color: #ff6600; border:none; border-radius:8px; cursor:pointer; box-shadow:0 0 12px gold;">
+      <i class="fas fa-birthday-cake" style="margin-right:8px;"></i>Join & Wish Me
+    </button>
+
+
+  
+
+
+  <!-- Firebase Config -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD6ViagGfPE6Pb3Ml1J2xWHhjGx53WlNOo",
+      authDomain: "birthdaycontributions.firebaseapp.com",
+      databaseURL: "https://birthdaycontributions-default-rtdb.firebaseio.com",
+      projectId: "birthdaycontributions",
+      storageBucket: "birthdaycontributions.firebasestorage.app",
+      messagingSenderId: "147686327811",
+      appId: "1:147686327811:web:ceae1ecd8f56fadeff7036",
+      measurementId: "G-GFMVJYXS40"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+  </script>
+
+  <!-- Countdown Timer -->
+  <script>
+    const countDownDate = new Date("June 28, 2025 00:00:00").getTime();
+    const timer = document.getElementById("timer");
+
+    setInterval(() => {
+      const now = new Date().getTime();
+      const distance = countDownDate - now;
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      timer.innerHTML = `🎂 ${days}d ${hours}h ${minutes}m ${seconds}s remaining`;
+    }, 1000);
+  </script>
+  
+
+  <!-- Glitter Animation Script -->
+  <script>
+    const starContainer = document.getElementById("stars");
+    function createStar() {
+      const star = document.createElement("div");
+      star.innerHTML = "★";
+      star.style.position = "absolute";
+      star.style.color = "gold";
+      star.style.fontSize = `${Math.random() * 10 + 10}px`;
+      star.style.left = `${Math.random() * 100}%`;
+      star.style.top = "-20px";
+      star.style.opacity = 0.8;
+      star.style.animation = "fall 5s linear infinite";
+      starContainer.appendChild(star);
+
+      setTimeout(() => star.remove(), 5000);
+    }
+    setInterval(createStar, 300);
+
+    const style = document.createElement("style");
+    style.innerHTML = `
+      @keyframes fall {
+        0% { transform: translateY(0); }
+        100% { transform: translateY(100vh); }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+  <!-- Confetti Script & Canvas -->
+<canvas id="confettiCanvas" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:998;"></canvas>
+
+<script>
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  let confetti = [];
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  function createConfettiPiece() {
+    return {
+      x: Math.random() * canvas.width,
+      y: Math.random() * -canvas.height,
+      radius: Math.random() * 6 + 2,
+      color: ['#FFD700', '#FF69B4', '#87CEEB', '#FF4500'][Math.floor(Math.random() * 4)],
+      speed: Math.random() * 3 + 2
+    };
+  }
+
+  function animateConfetti() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < confetti.length; i++) {
+      const c = confetti[i];
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, c.radius, 0, 2 * Math.PI);
+      ctx.fillStyle = c.color;
+      ctx.fill();
+      c.y += c.speed;
+      if (c.y > canvas.height) {
+        confetti[i] = createConfettiPiece();
+      }
+    }
+    requestAnimationFrame(animateConfetti);
+  }
+
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+  confetti = Array.from({ length: 100 }, createConfettiPiece);
+  animateConfetti();
+</script>
+<!-- 🌙 Auto-Toggling Dark Mode Button (User Click = Stop Toggle) -->
+<button id="darkModeBtn"
+  style="position:fixed; bottom:90px; right:20px; z-index:99999; 
+         background: transparent; border:none; 
+         width:50px; height:50px; cursor:pointer; 
+         display:flex; align-items:center; justify-content:center; 
+         opacity:0;">
+  <i id="darkIcon" class="fas fa-moon"></i>
+</button>
+
+
+<script>
+  const darkBtn = document.getElementById('darkModeBtn');
+  const darkIcon = document.getElementById('darkIcon');
+  let darkMode = false;
+  let autoSwitch = true;
+
+  // Toggle function
+  function toggleDarkMode() {
+    darkMode = !darkMode;
+    document.body.style.background = darkMode
+      ? "#121212"
+      : "url('cute-christmas-background-with-bokeh_1361-3548.jpg') no-repeat center center fixed";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.color = darkMode ? "lightgray" : "white";
+    darkIcon.className = darkMode ? "fas fa-sun" : "fas fa-moon";
+  }
+
+  // Auto toggle every second
+  let darkInterval = setInterval(() => {
+    if (autoSwitch) toggleDarkMode();
+  }, 1000);
+
+  // When user clicks, stop auto switching and toggle manually
+  darkBtn.onclick = function () {
+    autoSwitch = false;
+    clearInterval(darkInterval);
+    toggleDarkMode();
+  };
+</script>
+
+
+  <!-- Background Music & Mute Toggle -->
+  <audio id="bgMusic" autoplay loop>
+    <source src="https://www.bensound.com/bensound-music/bensound-sunny.mp3" type="audio/mp3">
+    Your browser does not support audio.
+  </audio>
+
+  <!-- Invisible but functional Mute/Unmute Button -->
+<button id="muteBtn"
+  style="position:fixed; bottom:20px; right:20px; z-index:200000; 
+         background: transparent; border:none; 
+         width:50px; height:50px; cursor:pointer; 
+         display:flex; align-items:center; justify-content:center; 
+         opacity:0;">
+  <i id="muteIcon" class="fas fa-volume-up"></i>
+</button>
+
+
+  <!-- Mute Script -->
+  <script>
+    const bgMusic = document.getElementById("bgMusic");
+    const muteBtn = document.getElementById("muteBtn");
+    const muteIcon = document.getElementById("muteIcon");
+
+    muteBtn.onclick = function () {
+      if (bgMusic.muted) {
+        bgMusic.muted = false;
+        muteIcon.className = "fas fa-volume-up";
+      } else {
+        bgMusic.muted = true;
+        muteIcon.className = "fas fa-volume-mute";
+      }
+    };
+
+    // For some mobile browsers that block autoplay:
+    document.addEventListener('click', () => {
+      bgMusic.play().catch(() => {});
+    }, { once: true });
+    
+  </script>
+<!-- 🎚️ Volume Control Bar -->
+<div id="volumeControl"
+  style="position:fixed; top:20px; left:20px; z-index:99999; display:flex; flex-direction:column; align-items:center; background: rgba(0,0,0,0.5); padding:12px 10px; border-radius:15px; box-shadow:0 0 12px rgba(0,255,255,0.6);">
+
+  <!-- Label -->
+  <span style="color:white; font-size:13px; margin-bottom:8px;">🔊 Volume</span>
+
+  <!-- Volume Bar Container -->
+  <div style="display:flex; align-items:center;">
+    <i class="fas fa-volume-up" style="color:white; font-size:16px; margin-right:8px;"></i>
+    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.4"
+      style="width:120px; height:5px; cursor:pointer; accent-color:cyan; border-radius:5px;">
+  </div>
+</div>
+
+<script>
+  const volumeSlider = document.getElementById("volumeSlider");
+
+  // Set initial volume
+  bgMusic.volume = volumeSlider.value;
+
+  // Update volume dynamically
+  volumeSlider.oninput = function () {
+    bgMusic.volume = this.value;
+
+    // If volume is 0, show mute icon; else volume icon
+    if (bgMusic.volume == 0) {
+      muteIcon.className = "fas fa-volume-mute";
+    } else {
+      muteIcon.className = "fas fa-volume-up";
+      bgMusic.muted = false; // Unmute when adjusting volume
+    }
+  };
+</script>
+
+
+</body>
+</html>

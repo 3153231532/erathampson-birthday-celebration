@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🎉 All Birthday Wishers</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- FontAwesome -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+</head>
+<body style="margin:0; padding:0; background: url('birthday-bg.jpg') no-repeat center center fixed; background-size: cover; font-family:sans-serif; color:white;">
+
+  <div style="background: rgba(0,0,0,0.7); margin: 20px auto; padding: 20px; border-radius: 12px; width: 95%; max-width: 1000px;">
+    <h2 style="text-align:center; color: gold;"><i class="fas fa-users"></i> All Birthday Wishers</h2>
+
+    <!-- Table -->
+    <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse: collapse; margin-top:20px;">
+        <thead>
+          <tr style="background-color:gold; color:black;">
+            <th style="padding:8px; border:1px solid white;">#</th>
+            <th style="padding:8px; border:1px solid white;"><i class="fas fa-user"></i> Name</th>
+            <th style="padding:8px; border:1px solid white;"><i class="fas fa-globe"></i> Country</th>
+            <th style="padding:8px; border:1px solid white;"><i class="fas fa-phone"></i> Contact</th>
+            <th style="padding:8px; border:1px solid white;"><i class="fas fa-coins"></i> Amount</th>
+            <th style="padding:8px; border:1px solid white;"><i class="fas fa-check-circle"></i> Status</th>
+            <th style="padding:8px; border:1px solid white;"><i class="fas fa-comment"></i> Message</th>
+          </tr>
+        </thead>
+        <tbody id="wishersTable" style="background-color: rgba(255,255,255,0.05);">
+          <!-- Filled by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Firebase Config -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD6ViagGfPE6Pb3Ml1J2xWHhjGx53WlNOo",
+      authDomain: "birthdaycontributions.firebaseapp.com",
+      databaseURL: "https://birthdaycontributions-default-rtdb.firebaseio.com",
+      projectId: "birthdaycontributions",
+      storageBucket: "birthdaycontributions.firebasestorage.app",
+      messagingSenderId: "147686327811",
+      appId: "1:147686327811:web:ceae1ecd8f56fadeff7036"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+  </script>
+
+  <!-- Fetch Wishers and Fill Table -->
+  <script>
+    const tbody = document.getElementById("wishersTable");
+
+    db.ref("wishers").once("value", snapshot => {
+      if (snapshot.exists()) {
+        let index = 1;
+        snapshot.forEach(child => {
+          const data = child.val();
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td style="padding:8px; border:1px solid white; text-align:center;">${index++}</td>
+            <td style="padding:8px; border:1px solid white;">${data.name}</td>
+            <td style="padding:8px; border:1px solid white;">${data.country.toUpperCase()}</td>
+            <td style="padding:8px; border:1px solid white;">${data.phone}</td>
+            <td style="padding:8px; border:1px solid white;">${data.amount}</td>
+            <td style="padding:8px; border:1px solid white;">${data.status}</td>
+            <td style="padding:8px; border:1px solid white;">${data.message || '—'}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } else {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:10px;">No wishers yet.</td></tr>';
+      }
+    });
+  </script>
+</body>
+</html>

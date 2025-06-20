@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🎫 Entry Confirmation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- FontAwesome -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+</head>
+<body style="margin:0; padding:0; background: url('birthday-bg.jpg') no-repeat center center fixed; background-size: cover; font-family:sans-serif; color:white;">
+
+  <div style="background: rgba(0,0,0,0.7); margin: 20px auto; padding: 20px; border-radius: 12px; width: 90%; max-width: 450px; text-align: center;">
+    <h2 style="color: gold;"><i class="fas fa-search"></i> Confirm Entry</h2>
+    
+    <input id="searchInput" type="text" placeholder="Enter Ticket ID / Name / Country" 
+      style="width: 100%; padding: 10px; margin-top: 15px; border: none; border-radius: 6px;">
+    
+    <button onclick="confirmEntry()" 
+      style="margin-top: 10px; width: 100%; padding: 10px; background: gold; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">
+      <i class="fas fa-check"></i> Search & Confirm
+    </button>
+
+    <div id="result" style="margin-top: 20px;"></div>
+  </div>
+
+  <!-- Firebase Config -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD6ViagGfPE6Pb3Ml1J2xWHhjGx53WlNOo",
+      authDomain: "birthdaycontributions.firebaseapp.com",
+      databaseURL: "https://birthdaycontributions-default-rtdb.firebaseio.com",
+      projectId: "birthdaycontributions",
+      storageBucket: "birthdaycontributions.firebasestorage.app",
+      messagingSenderId: "147686327811",
+      appId: "1:147686327811:web:ceae1ecd8f56fadeff7036"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+  </script>
+
+  <!-- Confirm Logic -->
+  <script>
+    function confirmEntry() {
+      const query = document.getElementById("searchInput").value.trim().toLowerCase();
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = "Searching...";
+
+      db.ref("wishers").once("value", snap => {
+        if (!snap.exists()) {
+          resultDiv.innerHTML = "No entries found.";
+          return;
+        }
+
+        let found = false;
+        snap.forEach(child => {
+          const data = child.val();
+          const id = child.key;
+          if (
+            id.toLowerCase().includes(query) ||
+            data.name.toLowerCase().includes(query) ||
+            data.country.toLowerCase().includes(query)
+          ) {
+            found = true;
+            resultDiv.innerHTML = `
+              <div style="margin-top:10px; background: white; color: black; padding: 15px; border-radius: 10px;">
+                <h3 style="margin:0; color:green;"><i class="fas fa-check-circle"></i> Verified</h3>
+                <p><strong>Name:</strong> ${data.name}</p>
+                <p><strong>Country:</strong> ${data.country.toUpperCase()}</p>
+                <p><strong>Phone:</strong> ${data.phone}</p>
+                <p><strong>Ticket ID:</strong> ${id.slice(0, 10)}</p>
+                <p><strong>Status:</strong> ${data.status}</p>
+              </div>
+            `;
+          }
+        });
+
+        if (!found) {
+          resultDiv.innerHTML = "<p style='color:red;'>No match found. Please check your input.</p>";
+        }
+      });
+    }
+  </script>
+</body>
+</html>

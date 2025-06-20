@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🎫 Event Entry Confirmation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- FontAwesome -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+</head>
+<body style="margin:0; padding:20px; background: url('birthday-bg.jpg') no-repeat center center fixed; background-size:cover; font-family:sans-serif; color:white;">
+
+  <div style="background: rgba(0,0,0,0.75); max-width: 480px; margin: auto; border-radius: 12px; padding: 20px;">
+    <h2 style="text-align:center; color: gold;"><i class="fas fa-check-circle"></i> Confirm Event Entry</h2>
+
+    <label for="searchInput" style="display:block; margin-top:15px; font-weight:bold;">
+      <i class="fas fa-search"></i> Search by Ticket ID, Name, or Country
+    </label>
+    <input id="searchInput" type="text" placeholder="Enter Ticket ID, Name or Country" 
+      style="width:100%; padding:10px; margin-top:8px; border-radius:8px; border:none; font-size:16px;">
+
+    <div id="results" style="margin-top:20px; max-height:300px; overflow-y:auto;">
+      <!-- Results appended here -->
+    </div>
+
+    <button onclick="window.location.href='confirm.html'" 
+      style="margin-top:20px; width:100%; padding:12px; background:gold; color:black; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">
+      <i class="fas fa-arrow-left"></i> Back to Confirmation
+    </button>
+  </div>
+
+  <!-- Hidden admin panel (invisible) -->
+  <div id="adminPanel" style="display:none; position:fixed; bottom:10px; right:10px; background:#222; color:#eee; padding:10px; border-radius:6px; font-size:12px;">
+    Admin Controls Here (hidden)
+  </div>
+
+  <!-- Firebase Config -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD6ViagGfPE6Pb3Ml1J2xWHhjGx53WlNOo",
+      authDomain: "birthdaycontributions.firebaseapp.com",
+      databaseURL: "https://birthdaycontributions-default-rtdb.firebaseio.com",
+      projectId: "birthdaycontributions",
+      storageBucket: "birthdaycontributions.firebasestorage.app",
+      messagingSenderId: "147686327811",
+      appId: "1:147686327811:web:ceae1ecd8f56fadeff7036"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+  </script>
+
+  <!-- Search & Update Logic -->
+  <script>
+    const searchInput = document.getElementById("searchInput");
+    const resultsDiv = document.getElementById("results");
+
+    searchInput.addEventListener("input", () => {
+      const query = searchInput.value.trim().toLowerCase();
+      resultsDiv.innerHTML = "";
+
+      if (!query) return;
+
+      db.ref("wishers").once("value", snapshot => {
+        if (!snapshot.exists()) {
+          resultsDiv.innerHTML = "<p>No entries found.</p>";
+          return;
+        }
+
+        let found = false;
+        snapshot.forEach(childSnap => {
+          const key = childSnap.key;
+          const data = childSnap.val();
+
+          // Match by ticket ID (key), name, or country
+          if (
+            key.toLowerCase().includes(query) ||
+            (data.name && data.name.toLowerCase().includes(query)) ||
+            (data.country && data.country.toLowerCase().includes(query))
+          ) {
+            found = true;
+            // Build entry row
+            const container = document.createElement("div");
+            container.style = "background:rgba(255,255,255,0.1); padding:10px; margin-bottom:12px; border-radius:8px; color:white;";
+            container.innerHTML = `
+              <p><strong>Name:</strong> ${data.name}</p>
+              <p><strong>Country:</strong> ${data.country.toUpperCase()}</p>
+              <p><strong>Phone:</strong> ${data.phone}</p>
+              <p><strong>Contribution:</strong> ${data.amount} (${data.status})</p>
+              <label style="display:flex; align-items:center; margin-top:8px; cursor:pointer;">
+                <input type="checkbox" ${data.arrived ? "checked" : ""} style="margin-right:8px;" />
+                Confirm Arrival
+              </label>
+            `;
+
+            const checkbox = container.querySelector("input[type='checkbox']");
+            checkbox.addEventListener("change", () => {
+              const arrivedStatus = checkbox.checked;
+              db.ref("wishers/" + key).update({ arrived: arrivedStatus ? true : false })
+                .then(() => {
+                  alert(`Arrival status updated: ${arrivedStatus ? "Confirmed" : "Removed"}`);
+                })
+                .catch(() => alert("Error updating arrival status."));
+            });
+
+            resultsDiv.appendChild(container);
+          }
+        });
+
+        if (!found) {
+          resultsDiv.innerHTML = "<p>No matching entries found.</p>";
+        }
+      });
+    });
+  </script>
+</body>
+</html>

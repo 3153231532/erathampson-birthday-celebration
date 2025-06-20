@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🎟️ Guest Entry Confirmation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+  <!-- FontAwesome -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body style="margin:0; padding:0; font-family:sans-serif; background: url('birthday-bg.jpg') no-repeat center center fixed; background-size:cover; color:white;">
+
+  <div style="background: rgba(0,0,0,0.7); padding: 20px; margin: 20px auto; width: 95%; max-width: 450px; border-radius: 10px;">
+    <h2 style="text-align:center; color: gold;"><i class="fas fa-search"></i> Confirm Guest Entry</h2>
+
+    <!-- Search Input -->
+    <input type="text" id="searchInput" placeholder="Enter Ticket ID, Name, or Country" 
+      style="width:100%; padding:10px; border-radius:8px; border:none; margin-top:15px;">
+
+    <button onclick="searchGuest()" 
+      style="margin-top:10px; width:100%; background:gold; color:black; padding:10px; font-weight:bold; border:none; border-radius:8px; cursor:pointer;">
+      <i class="fas fa-check-circle"></i> Confirm Entry
+    </button>
+
+    <div id="result" style="margin-top:20px;"></div>
+  </div>
+
+  <!-- Firebase Setup -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD6ViagGfPE6Pb3Ml1J2xWHhjGx53WlNOo",
+      authDomain: "birthdaycontributions.firebaseapp.com",
+      databaseURL: "https://birthdaycontributions-default-rtdb.firebaseio.com",
+      projectId: "birthdaycontributions",
+      storageBucket: "birthdaycontributions.firebasestorage.app",
+      messagingSenderId: "147686327811",
+      appId: "1:147686327811:web:ceae1ecd8f56fadeff7036"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+  </script>
+
+  <!-- Search Logic -->
+  <script>
+    function searchGuest() {
+      const input = document.getElementById("searchInput").value.trim().toLowerCase();
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = "Searching...";
+
+      db.ref("wishers").once("value", snapshot => {
+        if (!snapshot.exists()) {
+          resultDiv.innerHTML = "<p>No data found.</p>";
+          return;
+        }
+
+        let found = false;
+        snapshot.forEach(child => {
+          const id = child.key;
+          const data = child.val();
+          if (
+            id.toLowerCase().includes(input) ||
+            data.name?.toLowerCase().includes(input) ||
+            data.country?.toLowerCase().includes(input)
+          ) {
+            found = true;
+            resultDiv.innerHTML = `
+              <div style="background:rgba(255,255,255,0.1); padding:10px; border-radius:10px;">
+                <p><strong>Name:</strong> ${data.name}</p>
+                <p><strong>Country:</strong> ${data.country}</p>
+                <p><strong>Phone:</strong> ${data.phone}</p>
+                <p><strong>Residence:</strong> ${data.residence || 'N/A'}</p>
+                <p><strong>Amount:</strong> ${data.amount || '0'} UGX</p>
+                <p><strong>Status:</strong> ${data.status}</p>
+                <p><strong>Message:</strong> ${data.message || '—'}</p>
+                <p><strong>Ticket ID:</strong> ${id}</p>
+              </div>
+            `;
+          }
+        });
+
+        if (!found) {
+          resultDiv.innerHTML = "<p style='color:lightcoral;'>No guest found with that information.</p>";
+        }
+      });
+    }
+  </script>
+</body>
+</html>

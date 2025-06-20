@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>🎟️ Entry Confirmation - Chrispus Birthday</title>
+<!-- FontAwesome -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+</head>
+<body style="margin:0; padding:20px; font-family:sans-serif; background: url('birthday-bg.jpg') no-repeat center center fixed; background-size: cover; color: white;">
+
+<div style="background: rgba(0,0,0,0.75); max-width: 500px; margin: auto; border-radius: 12px; padding: 20px;">
+  <h2 style="text-align:center; color: gold;">
+    <i class="fas fa-check-circle"></i> Event Entry Confirmation
+  </h2>
+  
+  <label for="searchInput" style="display:block; margin-top:15px;">
+    <i class="fas fa-search" style="color:lightblue;"></i> Search by Ticket ID, Name or Country:
+  </label>
+  <input type="text" id="searchInput" placeholder="Type ticket ID, name, or country" 
+    style="width:100%; padding:8px; border-radius:6px; border:none; margin-top:6px; font-size:16px;" oninput="filterWishers()" />
+  
+  <div id="results" style="margin-top:20px; max-height: 400px; overflow-y: auto;">
+    <!-- Results appear here -->
+  </div>
+
+  <button onclick="window.location.href='index.html'" style="margin-top: 20px; width: 100%; padding: 12px; background: gold; border:none; border-radius: 8px; color:black; font-weight:bold; cursor:pointer;">
+    <i class="fas fa-home"></i> Back to Welcome
+  </button>
+</div>
+
+<!-- Invisible admin access button top-left -->
+<button id="adminBtn" title="Admin Access"
+  onclick="window.location.href='admin-fix.html'"
+  style="position:fixed; top:5px; left:5px; width:30px; height:30px; opacity:0; border:none; cursor:pointer;">
+</button>
+
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyD6ViagGfPE6Pb3Ml1J2xWHhjGx53WlNOo",
+    authDomain: "birthdaycontributions.firebaseapp.com",
+    databaseURL: "https://birthdaycontributions-default-rtdb.firebaseio.com",
+    projectId: "birthdaycontributions",
+    storageBucket: "birthdaycontributions.firebasestorage.app",
+    messagingSenderId: "147686327811",
+    appId: "1:147686327811:web:ceae1ecd8f56fadeff7036"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  let wishersData = [];
+
+  // Load all wishers on page load
+  window.onload = () => {
+    db.ref('wishers').once('value', snapshot => {
+      if (snapshot.exists()) {
+        wishersData = [];
+        snapshot.forEach(child => {
+          wishersData.push({ id: child.key, ...child.val() });
+        });
+        displayWishers(wishersData);
+      } else {
+        document.getElementById('results').innerHTML = '<p style="text-align:center; color:#ccc;">No wishers found.</p>';
+      }
+    });
+  };
+
+  // Filter wishers based on search input
+  function filterWishers() {
+    const query = document.getElementById('searchInput').value.trim().toLowerCase();
+    if (!query) {
+      displayWishers(wishersData);
+      return;
+    }
+    const filtered = wishersData.filter(w => {
+      return (
+        (w.id && w.id.toLowerCase().includes(query)) ||
+        (w.name && w.name.toLowerCase().includes(query)) ||
+        (w.country && w.country.toLowerCase().includes(query))
+      );
+    });
+    displayWishers(filtered);
+  }
+
+  // Display wishers with checkboxes
+  function displayWishers(list) {
+    const results = document.getElementById('results');
+    results.innerHTML = '';
+    if (list.length === 0) {
+      results.innerHTML = '<p style="text-align:center; color:#ccc;">No matching wishers found.</p>';
+      return;
+    }
+
+    list.forEach(w => {
+      const div = document.createElement('div');
+      div.style = 'background: rgba(255, 255, 255, 0.1); padding: 12px; margin-bottom: 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between;';
+      
+      div.innerHTML = `
+        <div>
+          <strong>${w.name}</strong> <br />
+          <small>Country: ${w.country.toUpperCase()} | Phone: ${w.phone}</small>
+          <br />
+          <small>Status: ${w.status || "N/A"}</small>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:lightgreen;">
+            <input type="checkbox" ${w.arrived ? 'checked' : ''} onchange="toggleArrived('${w.id}', this.checked)" />
+            Arrived
+          </label>
+        </div>
+      `;
+      results.appendChild(div);
+    });
+  }
+
+  // Toggle arrived status and save to Firebase
+  function toggleArrived(id, checked) {
+    db.ref('wishers/' + id).update({ arrived: checked })
+      .then(() => {
+        alert(`Marked as ${checked ? 'Arrived' : 'Not Arrived'}`);
+      })
+      .catch(err => {
+        alert('Error updating status: ' + err.message);
+      });
+  }
+</script>
+
+</body>
+</html>

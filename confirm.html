@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🎉 Thank You for Wishing Chrispus!</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- FontAwesome -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+  <!-- html2canvas for ticket download -->
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</head>
+<body style="margin:0; padding:0; background:url('gradient-gold-glitter-background_23-2151671310.avif') no-repeat center center fixed; background-size:cover; font-family:sans-serif; color:white;">
+
+  <div style="background:rgba(0,0,0,0.7); margin:20px auto; padding:20px; border-radius:12px; width:90%; max-width:400px; text-align:center;">
+    <h2 style="color:gold;"><i class="fas fa-birthday-cake"></i> Thank You!</h2>
+    <p id="thankText" style="margin-top:10px;"></p>
+
+    <!-- Ticket -->
+    <div id="ticket" style="margin-top:20px; background:white; color:black; padding:20px; border-radius:10px; box-shadow:0 0 10px gold;">
+      <h3 style="margin:0;">🎫 Birthday Entry Ticket</h3>
+      <p><strong>Name:</strong> <span id="ticketName"></span></p>
+      <p><strong>Ticket ID:</strong> <span id="ticketID"></span></p>
+      <p><strong>Event:</strong> Chrispus' Birthday - 28 June 2025</p>
+    </div>
+
+    <!-- Download Button -->
+    <button onclick="downloadTicket()" style="margin-top:15px; padding:10px 15px; border:none; border-radius:8px; background:gold; color:black; font-weight:bold; cursor:pointer;">
+      <i class="fas fa-download"></i> Download Ticket
+    </button>
+
+    <!-- Share Button -->
+    <button onclick="shareJoy()" style="margin-top:10px; padding:10px 15px; border:none; border-radius:8px; background:#0077cc; color:white; font-weight:bold; cursor:pointer;">
+      <i class="fas fa-share-alt"></i> Share Joy
+    </button>
+
+    <!-- View All Wishers -->
+    <button onclick="window.location.href='wishers.html'" style="margin-top:10px; padding:10px 15px; border:none; border-radius:8px; background:green; color:white; font-weight:bold; cursor:pointer;">
+      <i class="fas fa-users"></i> View All Wishers
+    </button>
+  </div>
+
+  <!-- Firebase Config -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD6ViagGfPE6Pb3Ml1J2xWHhjGx53WlNOo",
+      authDomain: "birthdaycontributions.firebaseapp.com",
+      databaseURL: "https://birthdaycontributions-default-rtdb.firebaseio.com",
+      projectId: "birthdaycontributions",
+      storageBucket: "birthdaycontributions.firebasestorage.app",
+      messagingSenderId: "147686327811",
+      appId: "1:147686327811:web:ceae1ecd8f56fadeff7036"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+  </script>
+
+  <!-- Logic to Fetch and Display User Info -->
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const userName = urlParams.get('name');
+
+    const thankText = document.getElementById("thankText");
+    const ticketName = document.getElementById("ticketName");
+    const ticketID = document.getElementById("ticketID");
+
+    db.ref("wishers").orderByChild("name").equalTo(userName).once("value", snapshot => {
+      if (snapshot.exists()) {
+        const data = Object.entries(snapshot.val())[0];
+        const id = data[0];
+        const info = data[1];
+
+        ticketName.textContent = info.name;
+        ticketID.textContent = id.slice(0, 10); // short ticket ID
+
+        thankText.innerHTML = `
+          Dear <strong>${info.name}</strong>, thank you for wishing CHRIS (a.k.a. the CHRISERATHAMPSON) 
+          a joyful birthday. You're invited to the celebration at Yellow House Apac, 
+          on <strong>28th June 2025</strong>. Blessings!
+        `;
+      } else {
+        thankText.innerHTML = "Could not find your registration. Please try again.";
+      }
+    });
+  </script>
+
+  <!-- Download Ticket as Image -->
+  <script>
+    function downloadTicket() {
+      const ticket = document.getElementById("ticket");
+      html2canvas(ticket).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "Chrispus_Birthday_Ticket.png";
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
+  </script>
+
+  <!-- Share Joy with Native Share API -->
+  <script>
+    function shareJoy() {
+      if (navigator.share) {
+        navigator.share({
+          title: "🎂 Celebrate Chrispus' Birthday!",
+          text: "I just wished Chrispus a happy birthday! Join the celebration and send your wish too 🎉",
+          url: window.location.origin + "/index.html"
+        }).catch(console.error);
+      } else {
+        alert("Sharing not supported on this device.");
+      }
+    }
+  </script>
+</body>
+</html>
