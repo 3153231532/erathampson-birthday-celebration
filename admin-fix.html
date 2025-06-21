@@ -16,10 +16,18 @@
     <h2 style="color:gold; text-align:center;">
       <i class="fas fa-tools"></i> Admin Fix Panel
     </h2>
+    <!-- View Wishers Button -->
+<button onclick="window.location.href='wishers.html'" 
+  style="margin-top:20px; padding:10px 18px; font-size:15px; color:white; 
+         background-color:#006400; border:1px solid black; border-radius:6px; 
+         cursor:pointer; box-shadow:0 0 8px limegreen; width:240px; display:block; margin-left:auto; margin-right:auto;">
+  <i class="fas fa-users" style="margin-right:6px;"></i> View All Well-Wishers
+</button>
+
 
     <input type="text" id="searchInput" placeholder="Search by name or ticket ID" 
       oninput="findWisher()" 
-      style="width:100%; padding:10px; margin-top:10px; border-radius:8px; border:none; font-size:16px;" />
+      style="width:95%; padding:10px; margin-top:10px; border-radius:8px; border:none; font-size:16px;" />
 
     <div id="editForm" style="display:none; margin-top:20px;">
       <h3>📝 Edit Wisher</h3>
