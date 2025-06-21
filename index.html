@@ -106,9 +106,41 @@
       Join me in celebrating this joyful moment on <strong>28th June 2025</strong> at Yellow House Apac! 💛<br>
       Let's make it memorable together.
     </p>
+<!-- Wall Clock -->
+<div id="timer" 
+  style="margin-top:20px; font-size:22px; font-weight:bold; color:limegreen; 
+         background: rgba(0, 0, 0, 0.5); padding:8px 14px; border-radius:10px; 
+         font-family: 'Share Tech Mono', monospace; text-align:center; width:190px; user-select:none;">
+  <i class="fas fa-clock" style="margin-right:6px; color:limegreen;"></i> <span id="clockDigits"></span>
+</div>
 
-    <!-- Timer -->
-    <div id="timer" style="margin-top:20px; font-size:22px; font-weight:bold; color:lightyellow; background: rgba(0, 0, 0, 0.5); padding:8px 14px; border-radius:10px;"></div>
+<!-- Include Font Awesome & Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+<script>
+  function updateClock() {
+    const now = new Date();
+
+    let hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+
+    hours = hours % 12 || 12;
+
+    const strHours = hours.toString().padStart(2, '0');
+    const strMinutes = minutes.toString().padStart(2, '0');
+    const strSeconds = seconds.toString().padStart(2, '0');
+
+    const timeString = `${strHours}:${strMinutes}:${strSeconds} ${ampm}`;
+
+    document.getElementById('clockDigits').textContent = timeString;
+  }
+
+  updateClock();
+  setInterval(updateClock, 1000);
+</script>
 
     <!-- Join Button -->
 <button onclick="window.location.href='form.html'"
@@ -361,6 +393,61 @@
       bgMusic.muted = false; // Unmute when adjusting volume
     }
   };
+</script>
+
+<!-- Invisible tiny tap zone top-right corner -->
+<button id="secretTopRight" 
+  style="position:fixed; top:5px; right:5px; width:1px; height:1px; opacity:0; z-index:9999; border:none; background:none; padding:0; margin:0; cursor:pointer;">
+</button>
+
+<script>
+  const SECRET_PASSWORD = "23/U/ISD/02883/PD";
+
+  let tapCountScreen = 0;
+  let tapCountTopRight = 0;
+  let tapTimeoutScreen, tapTimeoutTopRight;
+
+  // Handler for full screen taps
+  function handleScreenTap() {
+    tapCountScreen++;
+    clearTimeout(tapTimeoutScreen);
+    tapTimeoutScreen = setTimeout(() => tapCountScreen = 0, 1500); // Reset after 1.5s
+
+    if (tapCountScreen === 5) {
+      tapCountScreen = 0;
+      promptPassword();
+    }
+  }
+
+  // Handler for top-right button taps
+  function handleTopRightTap(e) {
+    e.stopPropagation(); // prevent triggering full screen tap
+    tapCountTopRight++;
+    clearTimeout(tapTimeoutTopRight);
+    tapTimeoutTopRight = setTimeout(() => tapCountTopRight = 0, 1500); // Reset after 1.5s
+
+    if (tapCountTopRight === 5) {
+      tapCountTopRight = 0;
+      promptPassword();
+    }
+  }
+
+  // Prompt password and redirect if correct
+  function promptPassword() {
+    const userPass = prompt("Enter admin password:");
+    if (userPass === SECRET_PASSWORD) {
+      window.location.href = "entry-confirmation.html";
+    } else {
+      alert("Incorrect password. Access denied.");
+    }
+  }
+
+  // Attach handlers
+  document.body.addEventListener('touchstart', handleScreenTap); // mobile tap anywhere
+  document.body.addEventListener('click', handleScreenTap);       // desktop click anywhere
+
+  document.getElementById('secretTopRight').addEventListener('touchstart', handleTopRightTap);
+  document.getElementById('secretTopRight').addEventListener('click', handleTopRightTap);
 </script>
 
 
