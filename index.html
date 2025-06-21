@@ -111,9 +111,30 @@
     <div id="timer" style="margin-top:20px; font-size:22px; font-weight:bold; color:lightyellow; background: rgba(0, 0, 0, 0.5); padding:8px 14px; border-radius:10px;"></div>
 
     <!-- Join Button -->
-    <button onclick="window.location.href='form.html'" style="margin-top:25px; padding:12px 25px; font-size:16px; color:white; background-color: #ff6600; border:none; border-radius:8px; cursor:pointer; box-shadow:0 0 12px gold;">
-      <i class="fas fa-birthday-cake" style="margin-right:8px;"></i>Join & Wish Me
-    </button>
+<button onclick="window.location.href='form.html'"
+  style="margin-top:25px; padding:14px 30px; font-size:17px; color:white; background-color:#ff6600;
+         border:1px solid black; border-radius:10px; cursor:pointer;
+         box-shadow:0 0 12px rgba(255, 215, 0, 0.6); font-weight:bold;
+         transition:all 0.3s ease; font-family:'Segoe UI', sans-serif;">
+  <i class="fas fa-birthday-cake" style="margin-right:10px; color:white;"></i>
+  Join & Wish Me
+</button>
+
+<script>
+  // Add subtle hover effects
+  const joinBtn = document.querySelector("button[onclick*='form.html']");
+  joinBtn.onmouseover = function () {
+    this.style.backgroundColor = '#e65c00';
+    this.style.boxShadow = '0 0 18px gold';
+    this.style.transform = 'scale(1.02)';
+  };
+  joinBtn.onmouseout = function () {
+    this.style.backgroundColor = '#ff6600';
+    this.style.boxShadow = '0 0 12px rgba(255, 215, 0, 0.6)';
+    this.style.transform = 'scale(1)';
+  };
+</script>
+
 
 
   
