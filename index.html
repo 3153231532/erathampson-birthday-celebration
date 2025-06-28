@@ -105,13 +105,16 @@
     <p style="font-size:16px; max-width:85%; padding:10px; background: rgba(0,0,0,0.5); border-radius:12px; margin-top:10px;">
       Join me in celebrating this joyful moment on <strong>28th June 2025</strong> at Yellow House Apac! 💛<br>
       Let's make it memorable together.
-    </p>
-<!-- Wall Clock -->
+    </p><!-- Wall Clock -->
 <div id="timer" 
   style="margin-top:20px; font-size:22px; font-weight:bold; color:limegreen; 
-         background: rgba(0, 0, 0, 0.5); padding:8px 14px; border-radius:10px; 
-         font-family: 'Share Tech Mono', monospace; text-align:center; width:190px; user-select:none;">
-  <i class="fas fa-clock" style="margin-right:6px; color:limegreen;"></i> <span id="clockDigits"></span>
+         background: rgba(0, 0, 0, 0.6); padding:10px 16px; border-radius:10px; 
+         font-family: 'Share Tech Mono', monospace; text-align:center; width:220px; 
+         user-select:none; border: 1px solid limegreen; box-shadow: 0 0 8px limegreen;">
+  <i class="fas fa-birthday-cake" style="margin-right:6px; color:gold;"></i> 
+  <span style="color:white;">Today is Chrispus' Birthday!</span><br>
+  <i class="fas fa-clock" style="margin-right:6px; color:limegreen;"></i> 
+  <span id="clockDigits"></span>
 </div>
 
 <!-- Include Font Awesome & Google Font -->
@@ -188,24 +191,6 @@
     const database = firebase.database();
   </script>
 
-  <!-- Countdown Timer -->
-  <script>
-    const countDownDate = new Date("June 28, 2025 00:00:00").getTime();
-    const timer = document.getElementById("timer");
-
-    setInterval(() => {
-      const now = new Date().getTime();
-      const distance = countDownDate - now;
-
-      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-      timer.innerHTML = `🎂 ${days}d ${hours}h ${minutes}m ${seconds}s remaining`;
-    }, 1000);
-  </script>
-  
 
   <!-- Glitter Animation Script -->
   <script>
@@ -449,6 +434,7 @@
   document.getElementById('secretTopRight').addEventListener('touchstart', handleTopRightTap);
   document.getElementById('secretTopRight').addEventListener('click', handleTopRightTap);
 </script>
+
 
 
 </body>

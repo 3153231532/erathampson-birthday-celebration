@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Admin Inbox - Birthday Wishes Chat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- FontAwesome -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+<style>
+  /* Reset & base */
+  body, html {
+    margin: 0; padding: 0; height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #111, #2c2c2c);
+    color: white;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    background: #ff6600;
+    padding: 15px 20px;
+    font-size: 20px;
+    font-weight: bold;
+    color: black;
+    text-align: center;
+    box-shadow: 0 0 10px gold;
+  }
+
+  #container {
+    flex: 1;
+    display: flex;
+    height: calc(100vh - 60px);
+  }
+
+  /* Sidebar: list of wishers */
+  #wishersList {
+    width: 320px;
+    background: #222;
+    border-right: 2px solid gold;
+    overflow-y: auto;
+    box-shadow: inset 0 0 10px #ff6600;
+  }
+  #wishersList h2 {
+    margin: 15px;
+    text-align: center;
+    color: gold;
+  }
+  .wisher-item {
+    padding: 12px 15px;
+    border-bottom: 1px solid #444;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s ease;
+  }
+  .wisher-item:hover {
+    background: #ff6600;
+    color: black;
+  }
+  .wisher-item.unread {
+    background: #440000;
+  }
+  .wisher-item.selected {
+    background: gold;
+    color: black;
+    font-weight: bold;
+  }
+  .wisher-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .wisher-name {
+    font-size: 16px;
+  }
+  .wisher-country {
+    font-size: 12px;
+    color: #aaa;
+  }
+  .wisher-lastmsg {
+    font-size: 13px;
+    margin-top: 4px;
+    color: #ccc;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .wisher-time {
+    font-size: 11px;
+    margin-left: 8px;
+    color: #999;
+    white-space: nowrap;
+  }
+
+  /* Main chat area */
+  #chatArea {
+    flex: 1;
+    background: #1a1a1a;
+    display: flex;
+    flex-direction: column;
+    box-shadow: inset 0 0 20px #ff6600;
+  }
+
+  #chatHeader {
+    background: #ff6600;
+    color: black;
+    padding: 15px 20px;
+    font-weight: bold;
+    box-shadow: 0 0 10px gold;
+  }
+
+  #messagesContainer {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chat-message {
+    max-width: 70%;
+    margin-bottom: 15px;
+    padding: 12px 18px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.4;
+    position: relative;
+    word-wrap: break-word;
+  }
+  .chat-message.wisher {
+    background: #ff6600;
+    color: black;
+    align-self: flex-start;
+    border-bottom-left-radius: 5px;
+    box-shadow: 0 0 8px #ff6600;
+  }
+  .chat-message.admin {
+    background: #444;
+    align-self: flex-end;
+    border-bottom-right-radius: 5px;
+    box-shadow: 0 0 8px #666;
+  }
+  .chat-message .timestamp {
+    font-size: 11px;
+    color: #ccc;
+    position: absolute;
+    bottom: 4px;
+    right: 12px;
+  }
+  .chat-message.audio-message audio {
+    max-width: 200px;
+    border-radius: 15px;
+    outline: none;
+    margin-top: 5px;
+  }
+
+  /* Input area */
+  #inputSection {
+    background: #222;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #444;
+  }
+  #replyInput {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 25px;
+    border: none;
+    font-size: 16px;
+    outline: none;
+  }
+  #sendReplyBtn, #voiceReplyBtn {
+    margin-left: 10px;
+    background: #ff6600;
+    border: none;
+    color: black;
+    font-size: 18px;
+    padding: 10px 16px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 8px gold;
+    transition: background-color 0.3s;
+  }
+  #sendReplyBtn:hover, #voiceReplyBtn:hover {
+    background-color: #e65500;
+  }
+
+  /* Delete button */
+  #deleteChatBtn {
+    background: #b22222;
+    border: none;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 0 8px red;
+    margin: 10px 20px;
+    align-self: flex-start;
+    transition: background-color 0.3s;
+  }
+  #deleteChatBtn:hover {
+    background-color: #8b0000;
+  }
+
+  /* Scrollbar styling */
+  #wishersList::-webkit-scrollbar, #messagesContainer::-webkit-scrollbar {
+    width: 8px;
+  }
+  #wishersList::-webkit-scrollbar-thumb, #messagesContainer::-webkit-scrollbar-thumb {
+    background: #ff6600;
+    border-radius: 10px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  🎉 Admin Inbox - Birthday Wishes Chat
+</header>
+
+<div id="container">
+  <!-- Wishers list -->
+  <div id="wishersList">
+    <h2>Wishers</h2>
+    <!-- wishers populate here dynamically -->
+  </div>
+
+  <!-- Chat area -->
+  <div id="chatArea">
+    <div id="chatHeader">Select a wisher to start chatting</div>
+    <div id="messagesContainer"></div>
+    <div id="inputSection" style="display:none;">
+      <input type="text" id="replyInput" placeholder="Type your reply..." autocomplete="off" />
+      <button id="voiceReplyBtn" title="Record Voice Reply"><i class="fas fa-microphone"></i></button>
+      <button id="sendReplyBtn" title="Send Reply"><i class="fas fa-paper-plane"></i></button>
+    </div>
+    <button id="deleteChatBtn" style="display:none;">Delete Chat</button>
+  </div>
+</div>
+
+<script>
+  // Initialize Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyD6ViagGfPE6Pb3Ml1J2xWHhjGx53WlNOo",
+    authDomain: "birthdaycontributions.firebaseapp.com",
+    databaseURL: "https://birthdaycontributions-default-rtdb.firebaseio.com",
+    projectId: "birthdaycontributions",
+    storageBucket: "birthdaycontributions.firebasestorage.app",
+    messagingSenderId: "147686327811",
+    appId: "1:147686327811:web:ceae1ecd8f56fadeff7036"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  const wishersListEl = document.getElementById('wishersList');
+  const chatHeader = document.getElementById('chatHeader');
+  const messagesContainer = document.getElementById('messagesContainer');
+  const inputSection = document.getElementById('inputSection');
+  const replyInput = document.getElementById('replyInput');
+  const sendReplyBtn = document.getElementById('sendReplyBtn');
+  const voiceReplyBtn = document.getElementById('voiceReplyBtn');
+  const deleteChatBtn = document.getElementById('deleteChatBtn');
+
+  let selectedWisherId = null;
+  let selectedWisherData = null;
+  let messagesRef = null;
+  let messagesListener = null;
+
+  // Utility to format timestamp
+  function formatTime(ts) {
+    const d = new Date(ts);
+    return d.toLocaleString(undefined, {hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short'});
+  }
+
+  // Load wishers from 'wishers' DB and check if they have chats
+  function loadWishers() {
+    wishersListEl.innerHTML = '<h2>Wishers</h2>'; // reset
+
+    db.ref('wishers').once('value').then(snapshot => {
+      if (!snapshot.exists()) {
+        wishersListEl.innerHTML += '<p style="padding:15px;">No wishers found.</p>';
+        return;
+      }
+
+      const wishers = snapshot.val();
+      // Now get chats and combine to check unread and last message
+      db.ref('chats').once('value').then(chatsSnap => {
+        const chats = chatsSnap.val() || {};
+
+        Object.entries(wishers).forEach(([wisherId, wisher]) => {
+          const chat = chats[wisherId] || { messages: {} };
+          const messages = chat.messages || {};
+          let lastMsg = null;
+          let unread = false;
+
+          // Find last message and unread count
+          Object.values(messages).forEach(msg => {
+            if(!lastMsg || (msg.timestamp > lastMsg.timestamp)) {
+              lastMsg = msg;
+            }
+            if(msg.from === wisherId && !msg.read) {
+              unread = true;
+            }
+          });
+
+          const wisherEl = document.createElement('div');
+          wisherEl.classList.add('wisher-item');
+          if(unread) wisherEl.classList.add('unread');
+          wisherEl.dataset.wisherId = wisherId;
+
+          if(selectedWisherId === wisherId) wisherEl.classList.add('selected');
+
+          wisherEl.innerHTML = `
+            <div class="wisher-info">
+              <div class="wisher-name">${wisher.name || 'Unknown'}</div>
+              <div class="wisher-country">${wisher.country ? wisher.country.toUpperCase() : ''}</div>
+              <div class="wisher-lastmsg">${lastMsg ? (lastMsg.text || (lastMsg.audioUrl ? '🎤 Voice Message' : '')) : 'No messages yet'}</div>
+            </div>
+            <div class="wisher-time">${lastMsg ? formatTime(lastMsg.timestamp) : ''}</div>
+          `;
+
+          wishersListEl.appendChild(wisherEl);
+        });
+
+        // Attach click handlers
+        document.querySelectorAll('.wisher-item').forEach(el => {
+          el.onclick = () => {
+            if(el.dataset.wisherId === selectedWisherId) return; // already selected
+            selectWisher(el.dataset.wisherId);
+          };
+        });
+      });
+    });
+  }
+
+  // Select a wisher & load chat messages
+  function selectWisher(wisherId) {
+    selectedWisherId = wisherId;
+    // Highlight selected
+    document.querySelectorAll('.wisher-item').forEach(el => {
+      el.classList.toggle('selected', el.dataset.wisherId === wisherId);
+    });
+
+    // Get wisher data
+    db.ref(`wishers/${wisherId}`).once('value').then(snap => {
+      selectedWisherData = snap.val();
+      chatHeader.textContent = `Chat with ${selectedWisherData.name || 'Unknown'} (${(selectedWisherData.country || '').toUpperCase()})`;
+      inputSection.style.display = 'flex';
+      deleteChatBtn.style.display = 'inline-block';
+
+      // Remove previous listener if any
+      if(messagesListener) messagesListener.off();
+
+      messagesRef = db.ref(`chats/${wisherId}/messages`);
+      messagesListener = messagesRef;
+      
+      messagesRef.on('value', snapshot => {
+        messagesContainer.innerHTML = '';
+        const messages = snapshot.val() || {};
+        Object.entries(messages).sort((a,b) => a[1].timestamp - b[1].timestamp).forEach(([msgId, msg]) => {
+          messagesContainer.appendChild(createChatMessage(msg, msg.from === wisherId));
+          // Mark wisher messages as read
+          if(msg.from === wisherId && !msg.read) {
+            messagesRef.child(msgId).update({read: true});
+          }
+        });
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      });
+    });
+  }
+
+  // Create message element
+  function createChatMessage(msg, isWisher) {
+    const div = document.createElement('div');
+    div.classList.add('chat-message');
+    div.classList.add(isWisher ? 'wisher' : 'admin');
+    if(msg.audioUrl) {
+      div.classList.add('audio-message');
+      const audio = document.createElement('audio');
+      audio.src = msg.audioUrl;
+      audio.controls = true;
+      div.appendChild(audio);
+    } else {
+      div.textContent = msg.text || '';
+    }
+    const timeSpan = document.createElement('span');
+    timeSpan.className = 'timestamp';
+    timeSpan.textContent = formatTime(msg.timestamp || Date.now());
+    div.appendChild(timeSpan);
+    return div;
+  }
+
+  // Send admin reply
+  sendReplyBtn.onclick = () => {
+    const text = replyInput.value.trim();
+    if(!text || !messagesRef) return;
+    const newMsgRef = messagesRef.push();
+    newMsgRef.set({
+      text,
+      timestamp: Date.now(),
+      from: 'erathampson',
+      read: true
+    }).then(() => {
+      replyInput.value = '';
+    });
+  };
+
+  // Voice reply recording (similar to wisher chat)
+  let recorder, audioChunks, recording = false;
+  voiceReplyBtn.onclick = async () => {
+    if(recording) {
+      recorder.stop();
+      recording = false;
+      voiceReplyBtn.style.backgroundColor = '#ff6600';
+    } else {
+      if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert('Voice recording not supported in this browser.');
+        return;
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        recorder = new MediaRecorder(stream);
+        audioChunks = [];
+        recorder.ondataavailable = e => audioChunks.push(e.data);
+        recorder.onstop = () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            if(!messagesRef) return;
+            messagesRef.push().set({
+              audioUrl: reader.result,
+              timestamp: Date.now(),
+              from: 'erathampson',
+              read: true
+            });
+          };
+          reader.readAsDataURL(audioBlob);
+        };
+        recorder.start();
+        recording = true;
+        voiceReplyBtn.style.backgroundColor = 'red';
+      } catch(e) {
+        alert('Microphone permission denied or error.');
+      }
+    }
+  };
+
+  // Delete chat button
+  deleteChatBtn.onclick = () => {
+    if(!selectedWisherId) return;
+    if(confirm(`Delete entire chat with ${selectedWisherData.name}? This action cannot be undone.`)) {
+      db.ref(`chats/${selectedWisherId}`).remove().then(() => {
+        alert('Chat deleted successfully.');
+        messagesContainer.innerHTML = '';
+        chatHeader.textContent = 'Select a wisher to start chatting';
+        inputSection.style.display = 'none';
+        deleteChatBtn.style.display = 'none';
+        selectedWisherId = null;
+        selectedWisherData = null;
+        loadWishers();
+      });
+    }
+  };
+
+  // Initial load
+  loadWishers();
+</script>
+
+</body>
+</html>
