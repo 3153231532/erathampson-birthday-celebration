@@ -93,29 +93,63 @@
   <!-- Star Glitter Animation -->
   <div id="stars" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index:0;"></div>
 
-  <!-- Main Welcome Section -->
-  <div style="z-index:1; position:relative; width:100%; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
-    
-    <img src="chris (2).jpg" alt="Adoko Chrispus" style="width:140px; height:140px; border-radius:50%; border:3px solid gold; margin-bottom:10px;">
+ <!-- Main Welcome Section -->
+<div style="z-index:1; position:relative; width:100%; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
 
-    <h1 style="font-size:26px; padding:10px; background: rgba(0,0,0,0.4); border-radius:15px; backdrop-filter:blur(6px); box-shadow:0 0 10px rgba(255,215,0,0.8); max-width:90%;">
-      🎉 Welcome to <strong style="color:gold;">Chrispus' Birthday Contribution</strong> 🎉
-    </h1>
+  <!-- Profile Image -->
+  <img src="chris (2).jpg" alt="Adoko Chrispus" style="width:140px; height:140px; border-radius:50%; border:3px solid gold; margin-bottom:10px; box-shadow:0 0 12px gold;">
 
-    <p style="font-size:16px; max-width:85%; padding:10px; background: rgba(0,0,0,0.5); border-radius:12px; margin-top:10px;">
-      Join me in celebrating this joyful moment on <strong>28th June 2025</strong> at Yellow House Apac! 💛<br>
-      Let's make it memorable together.
-    </p><!-- Wall Clock -->
-<div id="timer" 
-  style="margin-top:20px; font-size:22px; font-weight:bold; color:limegreen; 
-         background: rgba(0, 0, 0, 0.6); padding:10px 16px; border-radius:10px; 
-         font-family: 'Share Tech Mono', monospace; text-align:center; width:220px; 
-         user-select:none; border: 1px solid limegreen; box-shadow: 0 0 8px limegreen;">
-  <i class="fas fa-birthday-cake" style="margin-right:6px; color:gold;"></i> 
-  <span style="color:white;">Today is Chrispus' Birthday!</span><br>
-  <i class="fas fa-clock" style="margin-right:6px; color:limegreen;"></i> 
-  <span id="clockDigits"></span>
+  <!-- Welcome Message -->
+  <h1 style="font-size:26px; padding:10px 20px; background: rgba(0,0,0,0.4); border-radius:15px; backdrop-filter:blur(6px); box-shadow:0 0 10px rgba(255,215,0,0.8); max-width:90%; color:white;">
+    🎉 Today is <strong style="color:gold;">Chrispus' Birthday Celebration</strong> 🎉
+  </h1>
+
+  <!-- Birthday Info -->
+  <p style="font-size:16px; max-width:85%; padding:10px; background: rgba(0,0,0,0.5); border-radius:12px; margin-top:10px; color:white;">
+    🎂 Happening now at <strong>Yellow House, Apac</strong>!<br>
+    Thank you for being part of this special day. Let’s celebrate, share joy, and make unforgettable memories together! 💛
+  </p>
+
+  <!-- Wall Clock -->
+  <div id="timer" 
+    style="margin-top:20px; font-size:22px; font-weight:bold; color:limegreen; 
+          background: rgba(0, 0, 0, 0.6); padding:10px 16px; border-radius:10px; 
+          font-family: 'Share Tech Mono', monospace; text-align:center; width:240px; 
+          user-select:none; border: 1px solid limegreen; box-shadow: 0 0 8px limegreen;">
+    <i class="fas fa-birthday-cake" style="margin-right:6px; color:gold;"></i> 
+    <span style="color:white;">Today is Chrispus' Birthday!</span><br>
+    <i class="fas fa-clock" style="margin-right:6px; color:limegreen;"></i> 
+    <span id="clockDigits"></span>
+  </div>
+
 </div>
+
+<!-- Font and Clock Script -->
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+<script>
+  function updateClock() {
+    const now = new Date();
+
+    let hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+
+    hours = hours % 12 || 12;
+
+    const strHours = hours.toString().padStart(2, '0');
+    const strMinutes = minutes.toString().padStart(2, '0');
+    const strSeconds = seconds.toString().padStart(2, '0');
+
+    const timeString = `${strHours}:${strMinutes}:${strSeconds} ${ampm}`;
+    document.getElementById('clockDigits').textContent = timeString;
+  }
+
+  updateClock();
+  setInterval(updateClock, 1000);
+</script>
 
 <!-- Include Font Awesome & Google Font -->
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
